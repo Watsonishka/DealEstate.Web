@@ -1,0 +1,92 @@
+﻿@model RegistrationViewModel
+
+<div class="login-page">
+    <div class="login-card">
+
+        <div class="login-icon-wrapper">
+            <i class="fas fa-user-plus"></i>
+        </div>
+
+        <h2 class="main-title text-center mb-3">
+            Регистрация нового пользователя
+        </h2>
+
+        <p class="subtitle text-center mb-4">
+            Введите логин и пароль для создания аккаунта
+        </p>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-card mb-4">
+                <div class="validation-title">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Обнаружены ошибки
+                </div>
+
+                <div asp-validation-summary="All"></div>
+            </div>
+        }        
+        <form method="post"
+              asp-area=""
+              asp-controller="Account"
+              asp-action="Registration">
+
+            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+
+            <div class="mb-4">
+                <label asp-for="Login" class="form-label-custom"></label>
+                <input asp-for="Login" class="form-control custom-input" />
+                <span asp-validation-for="Login" class="field-validation"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label-custom"></label>
+                <input asp-for="Password" class="form-control custom-input" />
+                <span asp-validation-for="Password" class="field-validation"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ConfirmPassword" class="form-label-custom"></label>
+                <input asp-for="ConfirmPassword" class="form-control custom-input" />
+                <span asp-validation-for="ConfirmPassword" class="field-validation"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="LastName" class="form-label-custom"></label>
+                <input asp-for="LastName" class="form-control custom-input" />
+                <span asp-validation-for="LastName" class="field-validation"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="FirstName" class="form-label-custom"></label>
+                <input asp-for="FirstName" class="form-control custom-input" />
+                <span asp-validation-for="FirstName" class="field-validation"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Patronymic" class="form-label-custom"></label>
+                <input asp-for="Patronymic" id="patronymicInput" class="form-control custom-input" />
+                <span asp-validation-for="Patronymic" class="field-validation"></span>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input service-checkbox" id="hasPatronymic" />
+                    <label class="form-check-label" for="hasPatronymic">Нет отчества</label>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label asp-for="PhoneNumber" class="form-label-custom"></label>
+                <input asp-for="PhoneNumber" class="form-control custom-input" />
+                <span asp-validation-for="PhoneNumber" class="field-validation"></span>
+            </div>
+
+            <div class="login-divider my-4"></div>
+
+            <button type="submit"
+                    class="btn btn-main w-100 py-3">
+                Зарегистрироваться
+            </button>
+
+        </form>
+
+    </div>
+</div>

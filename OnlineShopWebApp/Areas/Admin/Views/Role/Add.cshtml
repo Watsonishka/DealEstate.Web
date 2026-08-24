@@ -1,0 +1,79 @@
+﻿@model RoleViewModel
+@{
+    ViewData["Title"] = "Добавление роли";
+}
+
+<div class="admin-container">
+    @await Html.PartialAsync("AdminSidebar")
+
+    <div class="admin-content">
+        <div class="admin-content-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="section-title">
+                        <i class="fas fa-user-tag"></i> Добавление роли
+                    </h1>
+                    <p class="subtitle">Создание новой роли для пользователей</p>
+
+                </div>
+                <a asp-area="Admin" 
+                asp-controller="Role"
+                asp-action="Index" 
+                class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-content-body">
+            <div class="realEstate-card p-4">
+                <form asp-area="Admin"
+                asp-controller="Role"
+                asp-action="Add" 
+                method="post">
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="validation-card mb-4">
+                            <div class="validation-title">
+                                <i class="fas fa-triangle-exclamation"></i>
+                                Обнаружены ошибки
+                            </div>
+
+                            <div asp-validation-summary="All"></div>
+                        </div>
+                    }
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label class="form-label-custom">
+                                <i class="fas fa-tag"></i>
+                                Название роли <span class="required-star">*</span>
+                            </label>
+                            <input asp-for="Name" class="custom-input" placeholder="Введите название роли" />
+                        </div>
+                    </div>
+
+                    <div class="form-group hint-group">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Примеры: Manager, Moderator, Editor, ContentManager
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-main">
+                            <i class="fas fa-plus"></i> Добавить роль
+                        </button>
+                        <a asp-area="Admin" 
+                        asp-controller="Role"
+                        asp-action="Index" 
+                        class="btn btn-outline">
+                            Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

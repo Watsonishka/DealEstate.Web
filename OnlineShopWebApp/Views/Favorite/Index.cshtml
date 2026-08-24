@@ -1,0 +1,102 @@
+﻿@model FavoriteViewModel
+
+@{
+    ViewData["Title"] = "Мое избранное";
+}
+
+<div class="container mt-5">
+
+    @if (Model == null || Model.Products == null || !Model.Products.Any())
+    {
+        <div class="empty-orders-card">
+            <div class="empty-order-icon-wrapper">
+                <i class="fas fa-heart"></i>
+            </div>
+
+            <h2 class="section-title mb-3">
+                Избранное пусто
+            </h2>
+
+            <p class="subtitle mb-4">
+                Здесь будут отображаться объекты недвижимости,
+                которые вы добавите в избранное.
+            </p>
+
+            <a asp-area=""
+            asp-controller="Home"
+            asp-action="Index"
+            class="btn btn-main">
+            Перейти к каталогу
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-5">
+            <h1 class="main-title">Мое избранное</h1>
+            <p class="subtitle">
+                Всего объектов в избранном: @Model.Products.Count
+            </p>
+        </div>
+
+        @foreach (var product in Model.Products)
+        {
+            <div class="favorite-row mb-4">
+                <div class="favorite-image">
+                    <img src="@product.PreviewImagePath"
+                         alt="@product.Name" />
+                </div>
+
+                <div class="favorite-info">
+                    <div class="developer-name">
+                        @product.Developer
+                    </div>
+
+                    <a asp-area=""
+                    asp-controller="Product"
+                    asp-action="Index"
+                    asp-route-id="@product.ID"
+                    class="property-card-link">
+                    @product.Name
+                    </a>
+
+                    <div class="location mt-2">
+                        <i class="fas fa-location-dot"></i>
+                        @product.City
+                    </div>
+
+                    <div class="location">
+                        <i class="fas fa-ruler-combined"></i>
+                        @product.Area м²
+                    </div>
+                </div>
+
+                <div class="favorite-price-block">
+                    <div class="favorite-price">
+                        @product.Cost.ToString("C")
+                    </div>
+
+                    <div class="favorite-actions">
+                        <a asp-area=""
+                        asp-controller="Bid"
+                        asp-action="Add"
+                        asp-route-productId="@product.ID"
+                        class="btn btn-main">
+                        Добавить в заявку
+                        </a>
+
+                        <a asp-area=""
+                        asp-controller="Favorite"
+                        asp-action="Remove"
+                        asp-route-productId="@product.ID"
+                        class="btn-outline">
+                        Удалить
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+</div>

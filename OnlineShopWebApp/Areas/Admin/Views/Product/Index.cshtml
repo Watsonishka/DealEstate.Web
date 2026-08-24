@@ -1,0 +1,168 @@
+﻿@model List<ProductViewModel>
+
+@{
+    ViewData["Title"] = "Недвижимость";
+}
+
+<div class="admin-container">
+
+    @await Html.PartialAsync("AdminSidebar")
+
+    <div class="admin-content">
+
+        <div class="admin-content-header d-flex justify-content-between align-items-center">
+
+            <div>
+                <h1 class="section-title">
+                    <i class="fas fa-building"></i>
+                    Недвижимость
+                </h1>
+
+                <p class="subtitle">
+                    Всего объектов: @Model.Count
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Product"
+               asp-action="Add"
+               class="btn btn-main admin-add-btn">
+
+                <i class="fas fa-plus"></i>
+                Добавить объект
+            </a>
+
+        </div>
+
+        <div class="admin-content-body">
+
+            @if (!Model.Any())
+            {
+                <div class="admin-empty">
+
+                    <i class="fas fa-city"></i>
+
+                    <h3>
+                        Объекты недвижимости отсутствуют
+                    </h3>
+
+                    <p>
+                        Добавьте первый объект недвижимости в каталог
+                    </p>
+
+                    <a asp-area="Admin"
+                       asp-controller="Product"
+                       asp-action="Create"
+                       class="btn btn-main">
+
+                        Создать объект
+
+                    </a>
+
+                </div>
+            }
+            else
+            {
+                @foreach (var product in Model)
+                {
+                    <div class="admin-product-card">
+
+                        <div class="admin-product-preview">
+
+                            <img src="@product.PreviewImagePath"
+                                 alt="@product.Name" />
+
+                        </div>
+
+                        <div class="admin-product-info">
+
+                            <div class="developer-name">
+                                @product.Developer
+                            </div>
+
+                            <div class="realEstate-title">
+                                @product.Name
+                            </div>
+
+                            <div class="location">
+                                <i class="fas fa-location-dot"></i>
+                                @product.City
+                            </div>
+
+                            <div class="location">
+                                <i class="fas fa-expand"></i>
+                                @product.Area м²
+                            </div>
+
+                            <div class="location">
+                                Этажей: @product.TotalFloors
+                            </div>
+
+                        </div>
+
+                        <div class="admin-product-price">
+
+                            @product.Cost.ToString("C")
+
+                        </div>
+
+                        <div class="admin-product-actions">
+                            <a asp-area="Admin"
+                               asp-controller="Product"
+                               asp-action="Update"
+                               asp-route-productID="@product.ID"
+                               class="btn btn-outline btn-sm">
+                                <i class="fas fa-eye"></i>/<i class="fas fa-pen"></i>
+                            </a>
+
+                            <button type="button"
+                                    class="btn btn-outline btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal_@product.ID">
+                                <i class="fas fa-trash"></i>
+                            </button>
+
+                            <div class="modal fade" id="deleteModal_@product.ID" tabindex="-1" aria-labelledby="modalWindow_@product.ID" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalWindow_@product.ID">
+                                                <i class="fas fa-trash"></i>
+                                                Удаление
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <form method="post"
+                                              asp-area="Admin"
+                                              asp-controller="Product"
+                                              asp-action="Delete"
+                                              asp-route-productID="@product.ID">
+
+                                            <div class="modal-body">
+                                                <p>Удалить объект недвижимости <strong style="color: #c59d5f;">@product.Name</strong>?</p>
+                                                <p class="customer-info">Данное действие нельзя отменить.</p>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Отмена</button>
+                                                <button type="submit" class="btn btn-outline">Удалить</button>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,7 @@
+﻿@model int
+
+@if (Model > 0)
+{
+    var displayValue = Model > 9 ? "9+" : Model.ToString();
+    <span class="bid-badge">@displayValue</span>
+}

@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DealEstate</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnlineShopWebApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <img src="/img/blueprint_background_white.png"
+         style="position: fixed; bottom: 0; right: 0; width: 1000px; height: auto; opacity: 0.2; pointer-events: none; z-index: 9999;"
+         alt="">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DealEstate</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.IsInRole(Constants.AdminRoleName))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Admin" asp-controller="Order" asp-action="Index">Панель администратора</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" asp-area="" asp-controller="Comparison" asp-action="Index"
+                               style="display: flex; align-items: center; gap: 8px;">
+                                Сравнение
+                                <i class="fas fa-chart-bar" style="color: #c59d5f; font-size: 18px;"></i>
+                                @await Component.InvokeAsync("Comparison")
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item d-flex align-items-center" style="gap: 8px;">
+                            <a class="nav-link" asp-area="" asp-controller="Favorite" asp-action="Index">
+                                <i class="fas fa-heart" style="color: #c59d5f; font-size: 18px;"></i> Избранное
+                            </a>
+                            <a class="nav-link" asp-area="" asp-controller="Order" asp-action="Index">
+                                <i class="fas fa-list-alt"></i> Оформленные заказы
+                            </a>
+                            <a class="nav-link position-relative" asp-area="" asp-controller="Bid" asp-action="Index">
+                                <i class="fas fa-envelope" style="color: #c59d5f; font-size: 18px;"></i> Заявка
+                                @await Component.InvokeAsync("Bid")
+                            </a>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <span class="nav-link text-success fw-bold">@User.Identity.Name</span>
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout" style="color: #c59d5f;">
+                                    <i class="fas fa-sign-out-alt"></i> Выйти
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Authorization" style="color: #c59d5f; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    <span>Войти</span>
+                                </a>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer border-top">
+        <div class="container">
+            &copy; 2026 - DealEstate - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

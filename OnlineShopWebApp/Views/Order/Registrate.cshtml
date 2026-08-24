@@ -1,0 +1,147 @@
+﻿@model BidViewModel
+
+@{
+    ViewData["Title"] = "Оформление заявки";
+    var user = ViewBag.DeliveryUserViewModel as DeliveryUserViewModel ?? new DeliveryUserViewModel();
+}
+
+<div class="container mt-5">
+
+    <div class="mb-5">
+        <h1 class="main-title">Оформление заявки</h1>
+        <p class="subtitle">
+            Оставьте контакты, чтобы наш менеджер мог с вами связаться
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+
+            <div class="summary-card h-100">
+
+                <h3 class="section-title mb-4">
+                    Контактные данные
+                </h3>
+
+                <form asp-area=""
+                    asp-controller="Order" 
+                    asp-action="Send" 
+                    method="post">
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="All" class="validation-card mb-4">
+                            <div class="validation-title">
+                                <i class="fas fa-triangle-exclamation"></i>
+                                Обнаружены ошибки
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label asp-for="@user.LastName" class="form-label-custom"></label>
+                        <input asp-for="@user.LastName" class="form-control custom-input" />
+                        <span asp-validation-for="@user.LastName" class="field-validation"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="@user.FirstName" class="form-label-custom"></label>
+                        <input asp-for="@user.FirstName" class="form-control custom-input" />
+                        <span asp-validation-for="@user.FirstName" class="field-validation"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="@user.Patronymic" class="form-label-custom"></label>
+                        <input asp-for="@user.Patronymic" class="form-control custom-input" id="patronymicInput" />
+                        <span asp-validation-for="@user.Patronymic" class="field-validation"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input service-checkbox" id="hasPatronymic" />
+                            <label class="form-check-label" for="hasPatronymic">Нет отчества</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="@user.PhoneNumber" class="form-label-custom"></label>
+                        <input asp-for="@user.PhoneNumber" class="form-control custom-input" />
+                        <span asp-validation-for="@user.PhoneNumber" class="field-validation"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="@user.Comment" class="form-label-custom"></label>
+                        <textarea asp-for="@user.Comment" rows="5" class="form-control custom-input" maxlength="1000"></textarea>
+                        <span asp-validation-for="@user.Comment" class="field-validation"></span>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        @if (Model.Items.Any())
+                        {
+                            <button type="submit" class="btn-main w-100 py-3">Отправить заявку</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn-main w-100 py-3" disabled>Отправить заявку</button>
+                        }
+
+                        <a asp-area=""
+                           asp-controller="Bid"
+                           asp-action="Index"
+                           class="btn-outline text-center py-3">
+                            Вернуться к подборке
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <div class="summary-card h-100">
+
+                <h3 class="section-title mb-4">Ваша подборка</h3>
+
+                @foreach (var item in Model.Items)
+                {
+                    <div class="checkout-object">
+                        <div class="checkout-object-title">@item.Product.Name</div>
+                        <div class="checkout-object-price">@item.Product.Cost.ToString("C")</div>
+
+                        @foreach (var service in item.Services.Where(s => !s.IsRemoved))
+                        {
+                            <div class="checkout-service">+ @service.Name - <span class="service-price">@service.Price.ToString("C")</span></div>
+                        }
+
+                        <hr class="separator" />
+                    </div>
+                }
+
+                <div class="reward-block">
+                    <div class="reward-content">
+                        <div>
+                            <i class="fas fa-user-tie reward-icon"></i>
+                            <span class="reward-label">Вознаграждение менеджера</span>
+                        </div>
+                        <span class="reward-amount">@Model.ManagerReward.ToString("C")</span>
+                    </div>
+                </div>
+
+                <hr class="separator" />
+
+                <div class="total-row mt-4">
+                    <span class="total-label">ИТОГО</span>
+                    <span class="total-amount">@((Model.ManagerReward + Model.ServicesTotalPrice).ToString("C"))</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,130 @@
+﻿@model ProductViewModel
+@{
+    ViewData["Title"] = "Объект недвижимости";
+}
+
+<div class="container-fluid px-4">
+
+    @if (Model != null)
+    {
+        <div class="product-details-card">
+            <div class="realEstate-card shadow-sm">
+
+                <div style="position: relative;">
+                    <img class="main-image w-100"
+                         src="@Model.PreviewImagePath"
+                         alt="Property">
+                </div>
+
+                <div class="card-body p-5">
+
+                    <div class="row">
+
+                        <div class="col-lg-8">
+
+                            <div class="developer-name mb-3">
+                                @Model.Developer
+                            </div>
+
+                            <h1 class="realEstate-title mb-3">
+                                @Model.Name
+                            </h1>
+
+                            <div class="location mb-4">
+                                <i class="fas fa-location-dot"></i> @Model.City
+                            </div>
+
+                            <div class="description location">
+                                @Model.Description
+                            </div>
+
+                            @if (Model.Category == Category.Apartments)
+                            {
+                                if (Model != null)
+                                {
+                                    <div class="mt-4 description">
+                                        <strong>Класс недвижимости:</strong> @EnumHelper.GetDescription(Model.Class)<br />
+                                        <strong>Площадь:</strong> @Model.Area м²<br />
+                                        <strong>Этаж:</strong> @Model.Floor из @Model.TotalFloors<br />
+                                        <strong>Балкон:</strong> @(Model.HasBalcony ? "Да" : "Нет")<br />
+                                        <strong>Высота потолков:</strong> @Model.CeilingHeight м<br />
+                                    </div>
+                                }
+                            }
+
+                            @if (Model.Category == Category.Houses)
+                            {
+                                if (Model != null)
+                                {
+                                    <div class="mt-4 description">
+                                        <strong>Площадь:</strong> @Model.Area м²<br />
+                                        <strong>Этажей в доме:</strong> @Model.TotalFloors<br />
+                                        <strong>Площадь участка:</strong> @Model.LandArea м²<br />
+                                        <strong>Гараж:</strong> @(Model.HasGarage ? "Да" : "Нет")<br />
+                                    </div>
+                                }
+                            }
+
+                        </div>
+
+                        <div class="col-lg-4">
+
+                            <div class="realEstate-card p-4">
+
+                                <div class="price mb-4">
+                                    @Model.Cost.ToString("C")
+                                </div>
+
+                                <div class="d-grid gap-3">
+
+                                    <a asp-area=""
+                                    asp-controller="Bid"
+                                    asp-action="Add"
+                                    asp-route-productId="@Model.ID"
+                                    class="btn-main text-center py-3">
+                                    Добавить в заявку
+                                    </a>
+
+                                    <a asp-area=""
+                                    asp-controller="Home"
+                                    asp-action="Index"
+                                    class="btn-outline text-center py-3">
+                                    Вернуться к поиску
+                                    </a>
+
+                                    <a asp-controller="Favorite"
+                                       asp-action="Add"
+                                       asp-route-productId="@Model.ID"
+                                       class="btn-outline text-center py-3">
+                                        <i class="far fa-heart me-2"></i> Добавить в избранное
+                                    </a>
+
+                                    <a asp-area=""
+                                    asp-controller="Comparison"
+                                    asp-action="Add"
+                                    asp-route-productId="@Model.ID"
+                                    class="btn-outline w-100">
+                                    <i class="fas fa-magnifying-glass me-2"></i>Добавить в сравнение
+                                </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-light shadow-sm rounded-4 p-5 text-center">
+            <h2>Такого объекта не существует</h2>
+        </div>
+    }
+
+</div>

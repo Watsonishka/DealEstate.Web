@@ -1,0 +1,193 @@
+﻿@model Tuple<List<UserViewModel>, List<RoleViewModel>>
+
+@{
+    ViewData["Title"] = "Пользователи";
+    var users = Model?.Item1 ?? new List<UserViewModel>();
+    var roles = Model?.Item2 ?? new List<RoleViewModel>();
+}
+
+<div class="admin-container">
+    @await Html.PartialAsync("AdminSidebar")
+
+    <div class="admin-content">
+        <div class="admin-content-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="section-title">
+                        <i class="fas fa-users"></i> Пользователи
+                    </h1>
+                    <p class="subtitle">Управление зарегистрированными пользователями</p>
+                </div>
+                <a asp-area="Admin"
+                   asp-controller="User"
+                   asp-action="Add"
+                   class="btn btn-main admin-add-btn">
+                    <i class="fas fa-plus"></i>
+                    Добавить пользователя
+                </a>
+            </div>
+        </div>
+
+        @if (users == null || !users.Any())
+        {
+            <div class="admin-content-body">
+                <div class="info-placeholder">
+                    <i class="fas fa-users"></i>
+                    <h3>Пользователи</h3>
+                    <p>Здесь будет список зарегистрированных пользователей с возможностью редактирования</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="admin-content-body">
+                <div class="orders-table-wrapper">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ФИО пользователя</th>
+                                <th>Телефон</th>
+                                <th>Логин</th>
+                                <th>Роль</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in users)
+                            {
+                                <tr style="@(user.IsCancelled ? "opacity: 0.6; background-color: rgba(0,0,0,0.02);" : "")">
+                                    <td>
+                                        <span class="user-id">#@user.ID.ToString()[..8].ToUpper()</span>
+                                    </td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <span class="customer-name">
+                                                @user.LastName @user.FirstName @user.Patronymic
+                                            </span>
+                                            @if (user.IsCancelled)
+                                            {
+                                                <small class="text-danger d-block">(Удален)</small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="customer-phone">@user.PhoneNumber</span>
+                                    </td>
+                                    <td>
+                                        <span class="user-login">@user.Login</span>
+                                    </td>
+                                    <td>
+                                        @if (user.IsCancelled)
+                                        {
+                                            <span class="user-login">Роль: @(user.Role ?? "Не выбрана")</span>
+                                        }
+                                        else
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="User"
+                                                  asp-action="ChangeRole"
+                                                  method="post"
+                                                  class="status-form">
+                                                <input type="hidden" name="userID" value="@user.ID" />
+                                                <select name="roleName" class="status-select" onchange="this.form.submit()">
+                                                    <option value="" selected="@(user.Role == null ? "selected" : null)">
+                                                        Не выбрана
+                                                    </option>
+                                                    @foreach (var role in roles)
+                                                    {
+                                                        <option value="@role.Name" selected="@(user.Role == role.Name)">
+                                                            @role.Name
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </form>
+
+                                            <span class="user-login">Текущая роль: @user.Role</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (user.IsCancelled)
+                                        {
+                                            <span class="text-muted" title="Пользователь удален">
+                                                <i class="fas fa-user-slash"></i> Удален
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <div class="action-buttons" style="display: flex; gap: 8px; align-items: center;">
+                                                <a asp-area="Admin"
+                                                   asp-controller="User"
+                                                   asp-action="Update"
+                                                   asp-route-userID="@user.ID"
+                                                   class="btn-action"
+                                                   title="Редактировать">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
+
+                                                <a asp-area="Admin"
+                                                   asp-controller="User"
+                                                   asp-action="ChangePassword"
+                                                   asp-route-userId="@user.ID"
+                                                   class="btn-action"
+                                                   title="Изменить пароль">
+                                                    <i class="fas fa-key"></i>
+                                                </a>
+
+                                                <button type="button" class="btn-action"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal_@user.ID"
+                                                        title="Удалить">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+
+                                                <div class="modal fade" id="deleteModal_@user.ID" tabindex="-1" aria-labelledby="modalWindow_@user.ID" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="modalWindow_@user.ID">
+                                                                    <i class="fas fa-trash"></i>
+                                                                    Удаление
+                                                                </h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+
+                                                            <form method="post"
+                                                                  asp-area="Admin"
+                                                                  asp-controller="User"
+                                                                  asp-action="Delete"
+                                                                  asp-route-userID="@user.ID">
+
+                                                                <div class="modal-body">
+                                                                    <p>Удалить пользователя <strong style="color: #c59d5f;">@user.LastName @user.FirstName</strong>?</p>
+                                                                    <p class="customer-info">Данное действие нельзя отменить.</p>
+                                                                </div>
+
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Отмена</button>
+                                                                    <button type="submit" class="btn btn-outline">Удалить</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="footer-label text-center">
+                                    Итого зарегистрированных пользователей: @users.Count
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>

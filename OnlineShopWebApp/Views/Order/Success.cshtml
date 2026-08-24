@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Заявка отправлена";
+}
+
+<div class="container success-page">
+
+    <div class="success-card">
+
+        <div class="success-icon">
+            <i class="fas fa-circle-check"></i>
+        </div>
+
+        <h1 class="main-title mb-4">
+            Спасибо за заявку!
+        </h1>
+
+        <p class="success-text">
+            Ваш запрос успешно отправлен.
+            Менеджер свяжется с вами в течение 30 минут для уточнения деталей.
+        </p>
+
+        <div class="success-divider"></div>
+
+        <p class="success-subtext">
+            Пока ожидаете звонок, можете продолжить просмотр
+            доступных объектов недвижимости.
+        </p>
+
+        <div class="success-buttons">
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-main px-5">
+                <i class="fas fa-house me-2"></i>
+                На главную
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

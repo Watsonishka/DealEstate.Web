@@ -1,0 +1,324 @@
+﻿@model ComparisonViewModel
+
+@{
+    ViewData["Title"] = "Сравнение объектов";
+}
+
+@if (Model == null || Model.Products == null || !Model.Products.Any())
+{
+    <div class="container mt-5">
+        <div class="col-12">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-arrows-left-right"></i>
+                </div>
+                <h3 class="empty-state-title">Нет объектов для сравнения</h3>
+                <p class="empty-state-text">
+                    Добавьте интересующие вас объекты недвижимости,<br />
+                    чтобы сравнить их характеристики.
+                </p>
+                <a asp-area=""
+                asp-controller="Home" 
+                asp-action="Index" 
+                class="btn-main px-4 py-2" style="display: inline-block; margin-top: 15px;">
+                    <i class="fas fa-arrow-left me-2"></i>Перейти к каталогу
+                </a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+
+        <div class="mb-5">
+            <h1 class="main-title">Сравнение объектов</h1>
+            <p class="subtitle">
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    @:Сравнивается объектов: @Model.Products.Count
+                }
+                else
+                {
+                    @:Выберите объекты для сравнения
+                }
+            </p>
+        </div>
+
+        <div class="compare-wrapper">
+            <div class="compare-table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th class="compare-label-col">Характеристика</th>
+                            @foreach (var product in Model.Products)
+                            {
+                                <th class="compare-product-col">
+                                    <div class="compare-product-header">
+                                        <div class="compare-product-image">
+                                            <img src="@product.PreviewImagePath" alt="@product.Name" />
+                                        </div>
+                                        <div class="compare-product-name">
+                                            @product.Name
+                                        </div>
+                                        <div class="compare-product-price">
+                                            @product.Cost.ToString("C")
+                                        </div>
+                                        <a asp-area=""
+                                        asp-controller="Comparison" 
+                                        asp-action="Remove" 
+                                        asp-route-productId="@product.ID"
+                                           class="compare-remove-btn" title="Убрать из сравнения">
+                                            <i class="fas fa-xmark"></i>
+                                        </a>
+                                    </div>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td class="compare-label">Категория</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value">
+                                    <span class="compare-badge">
+                                        @(product.Category == Category.Apartments ? "Квартира" : "Дом")
+                                    </span>
+                                </td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-label">Город</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value">
+                                    <i class="fas fa-location-dot me-1" style="color: #c59d5f;"></i>
+                                    @product.City
+                                </td>
+                            }
+                        </tr>
+
+                        <tr class="compare-highlight-row">
+                            <td class="compare-label">Стоимость</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value compare-price-value">
+                                    @product.Cost.ToString("C")
+                                </td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-label">Площадь, м²</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value">
+                                    @product.Area м²
+                                </td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-label">Застройщик</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value">
+                                    @product.Developer
+                                </td>
+                            }
+                        </tr>
+
+                        @if (Model.Products.Any(p => p.Category == Category.Apartments))
+                        {
+                            <tr>
+                                <td class="compare-label">Класс</td>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <td class="compare-value">
+                                        @if (product is Apartment apartment)
+                                        {
+                                            <span class="compare-badge compare-badge-class">
+                                                @apartment.Class.GetDescription()
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                        @if (Model.Products.Any(p => p.Category == Category.Apartments))
+                        {
+                            <tr>
+                                <td class="compare-label">Этаж</td>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <td class="compare-value">
+                                        @if (product is Apartment apartment)
+                                        {
+                                            @($"{apartment.Floor} из {product.TotalFloors}")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                        @if (Model.Products.Any(p => p.Category == Category.Apartments))
+                        {
+                            <tr>
+                                <td class="compare-label">Балкон</td>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <td class="compare-value">
+                                        @if (product is Apartment apartment)
+                                        {
+                                            @if (apartment.HasBalcony)
+                                            {
+                                                <span class="compare-check"><i class="fas fa-check-circle"></i> Есть</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="compare-cross"><i class="fas fa-circle-xmark"></i> Нет</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                        @if (Model.Products.Any(p => p.Category == Category.Apartments))
+                        {
+                            <tr>
+                                <td class="compare-label">Высота потолков, м</td>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <td class="compare-value">
+                                        @if (product is Apartment apartment)
+                                        {
+                                            @apartment.CeilingHeight
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                        @if (Model.Products.Any(p => p.Category == Category.Houses))
+                        {
+                            <tr>
+                                <td class="compare-label">Площадь участка, м²</td>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <td class="compare-value">
+                                        @if (product is House house)
+                                        {
+                                            @house.LandArea
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                        @if (Model.Products.Any(p => p.Category == Category.Houses))
+                        {
+                            <tr>
+                                <td class="compare-label">Гараж</td>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <td class="compare-value">
+                                        @if (product is House house)
+                                        {
+                                            @if (house.HasGarage)
+                                            {
+                                                <span class="compare-check"><i class="fas fa-check-circle"></i> Есть</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="compare-cross"><i class="fas fa-circle-xmark"></i> Нет</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                        <tr>
+                            <td class="compare-label">Этажей в доме</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value">
+                                    @product.TotalFloors
+                                </td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-label">Описание</td>
+                            @foreach (var product in Model.Products)
+                            {
+                                <td class="compare-value compare-description">
+                                    @if (!string.IsNullOrWhiteSpace(product.Description))
+                                    {
+                                        @product.Description
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Нет описания</span>
+                                    }
+                                </td>
+                            }
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="compare-actions mt-4">
+            <div class="d-flex justify-content-between flex-wrap gap-3">
+                
+                <a asp-area=""
+                asp-controller="Home" 
+                asp-action="Index" 
+                class="btn-outline">
+                    <i class="fas fa-arrow-left me-2"></i>Продолжить выбор
+                </a>
+
+                <div class="d-flex gap-3">
+                    <a asp-area=""
+                    asp-controller="Comparison"
+                    asp-action="Clear" 
+                    class="btn-outline">
+                    <i class="fas fa-trash-can me-2"></i>Очистить
+                </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

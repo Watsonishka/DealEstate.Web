@@ -1,0 +1,308 @@
+﻿@model OrderViewModel
+
+@{
+	ViewData["Title"] = $"Заказ #{Model.ID.ToString()[..8].ToUpper()}";
+}
+
+<div class="admin-container">
+	@await Html.PartialAsync("AdminSidebar")
+
+	<div class="admin-content">
+
+		<div class="admin-content-header">
+			<div class="d-flex justify-content-between align-items-center">
+				<div>
+					<h1 class="section-title">
+						Детали заказа
+					</h1>
+					<p class="subtitle">
+						#@Model.ID.ToString()[..8].ToUpper()
+					</p>
+				</div>
+
+				<a asp-area="Admin"
+				   asp-controller="Order"
+				   asp-action="Index"
+				   class="btn btn-outline">
+					Назад
+				</a>
+			</div>
+		</div>
+
+		<div class="admin-content-body">
+
+			@if (Model != null)
+			{
+				<form method="post"
+					  asp-area="Admin"
+					  asp-controller="Order"
+					  asp-action="UpdateStatus">
+
+					<input type="hidden"
+						   name="id"
+						   value="@Model.ID" />
+
+
+					<div class="realEstate-card p-4 mb-4">
+
+						<h3 class="section-title mb-4">
+							Информация о заказе
+						</h3>
+
+						<div class="form-row">
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									ID заказа
+								</label>
+
+								<div class="custom-input">
+									@Model.ID
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Дата создания
+								</label>
+
+								<div class="custom-input">
+									@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Пользователь
+								</label>
+
+								<div class="custom-input">
+									@Model.UserID
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Количество позиций
+								</label>
+
+								<div class="custom-input">
+									@Model.Items?.Count
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Стоимость объектов
+								</label>
+
+								<div class="custom-input">
+									@Model.ProductsTotalPrice.ToString("C")
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Стоимость услуг
+								</label>
+
+								<div class="custom-input">
+									@Model.ServicesTotalPrice.ToString("C")
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Вознаграждение
+								</label>
+
+								<div class="custom-input">
+									@Model.ManagerReward.ToString("C")
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Итого
+								</label>
+
+								<div class="custom-input">
+									@((Model.ManagerReward + Model.ServicesTotalPrice).ToString("C"))
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label-custom">
+									Статус
+								</label>
+
+								<div class="custom-input">
+									@(Model.Status.GetDescription())
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+
+					<div class="realEstate-card p-4 mb-4">
+
+						<h3 class="section-title mb-4">
+							Покупатель
+						</h3>
+
+						@if (Model.DeliveryUser != null)
+						{
+							<div class="form-row">
+
+								<div class="form-group full-width">
+
+									<label class="form-label-custom">
+										ФИО
+									</label>
+
+									<div class="custom-input">
+										@Model.DeliveryUser.LastName
+										@Model.DeliveryUser.FirstName
+										@Model.DeliveryUser.Patronymic
+									</div>
+
+								</div>
+
+								<div class="form-group">
+
+									<label class="form-label-custom">
+										Телефон
+									</label>
+
+									<div class="custom-input">
+										@Model.DeliveryUser.PhoneNumber
+									</div>
+
+								</div>
+
+								@if (!string.IsNullOrWhiteSpace(Model.DeliveryUser.Comment))
+								{
+									<div class="form-group full-width">
+
+										<label class="form-label-custom">
+											Комментарий
+										</label>
+
+										<div class="custom-input">
+											@Model.DeliveryUser.Comment
+										</div>
+
+									</div>
+								}
+
+							</div>
+						}
+						else
+						{
+							<p class="text-muted">
+								Данные отсутствуют
+							</p>
+						}
+
+					</div>
+
+
+					<div class="realEstate-card p-4">
+
+						<h3 class="section-title mb-4">
+							Состав заказа
+						</h3>
+
+						@if (Model.Items != null && Model.Items.Any())
+						{
+							@foreach (var item in Model.Items)
+							{
+								<div class="realEstate-card p-3 mb-3">
+
+									<h4 class="product-title">
+										@item.ProductName
+									</h4>
+
+									<div class="form-row">
+
+										<div class="form-group">
+											<label class="form-label-custom">
+												Город
+											</label>
+
+											<div class="custom-input">
+												@item.ProductCity
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label class="form-label-custom">
+												Площадь
+											</label>
+
+											<div class="custom-input">
+												@item.ProductArea м²
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label class="form-label-custom">
+												Стоимость
+											</label>
+
+											<div class="custom-input price-value">
+												@item.CurrentPrice.ToString("C")
+											</div>
+										</div>
+
+									</div>
+
+									@if (item.Services != null &&
+										item.Services.Any(x => !x.IsRemoved))
+									{
+										<hr class="separator" />
+
+										<h5 class="services-title">
+											Дополнительные услуги
+										</h5>
+
+										@foreach (var service in item.Services.Where(x => !x.IsRemoved))
+										{
+											<div class="service-row">
+												<span>@service.Name</span>
+												<strong class="service-price">
+													@service.Price.ToString("C")
+												</strong>
+											</div>
+										}
+									}
+
+								</div>
+							}
+
+							<div class="order-summary">
+								<h4 class="order-total">
+									Итого:
+									@((Model.ManagerReward + Model.ServicesTotalPrice).ToString("C"))
+								</h4>
+
+							</div>
+						}
+						else
+						{
+							<p class="text-muted">
+								Заказ пуст
+							</p>
+						}
+
+					</div>
+
+				</form>
+			}
+
+		</div>
+
+	</div>
+</div>

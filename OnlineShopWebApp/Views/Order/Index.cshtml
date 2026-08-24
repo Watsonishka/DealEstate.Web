@@ -1,0 +1,198 @@
+﻿@model List<OrderViewModel>
+
+@{
+	ViewData["Title"] = "Мои заказы";
+}
+
+<div class="container mt-5">
+
+	<div class="mb-5">
+		<h1 class="main-title">Мои заказы</h1>
+		<p class="subtitle">
+			Всего заявок: @Model.Count
+		</p>
+	</div>
+
+	@if (Model == null || !Model.Any())
+	{
+		<div class="empty-orders-card">
+
+			<div class="empty-order-icon-wrapper">
+				<i class="fas fa-building"></i>
+			</div>
+
+			<h2 class="section-title mb-3">
+				У вас пока нет заказов
+			</h2>
+
+			<p class="subtitle mb-4">
+				Выберите интересующие объекты недвижимости
+				и оформите первый заказ.
+			</p>
+
+			<a asp-controller="Home"
+			   asp-action="Index"
+			   class="btn btn-main">
+				Перейти к каталогу
+			</a>
+
+		</div>
+	}
+	else
+	{
+		@foreach (var order in Model.OrderByDescending(x => x.CreatedAt))
+		{
+			<div class="order-card mb-5">
+				<div class="order-header">
+
+					<div class="order-status-icon">
+						@{
+							switch (order.Status)
+							{
+								case OrderStatus.Created:
+									<i class="fas fa-clock" style="color: #c59d5f; font-size: 72px;"></i>
+									break;
+								case OrderStatus.InProgress:
+									<i class="fas fa-spinner" style="color: #7B9CC0; font-size: 72px;"></i>
+									break;
+								case OrderStatus.Completed:
+									<i class="fas fa-check-circle" style="color: #3F826E; font-size: 72px;"></i>
+									break;
+								default:
+									<i class="fas fa-question-circle" style="color: #6c757d; font-size: 72px;"></i>
+									break;
+							}
+						}
+					</div>
+
+					<div class="order-main-info">
+
+						<div class="d-flex align-items-center gap-3 flex-wrap">
+
+							<div class="developer-name">
+								Заявка №@order.ID.ToString()[..8].ToUpper()
+							</div>
+
+							<span class="order-status-badge">
+								@EnumHelper.GetDescription(order.Status)
+							</span>
+
+						</div>
+
+						<div class="location mt-2">
+							<i class="fas fa-calendar-days"></i>
+							@order.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+						</div>
+
+						<div class="customer-name mt-4">
+							@order.DeliveryUser.LastName
+							@order.DeliveryUser.FirstName
+							@order.DeliveryUser.Patronymic
+						</div>
+
+						<div class="location mt-2">
+							<i class="fas fa-phone"></i>
+							@order.DeliveryUser.PhoneNumber
+						</div>
+
+						@if (!string.IsNullOrWhiteSpace(order.DeliveryUser.Comment))
+						{
+							<div class="description mt-3">
+								"@order.DeliveryUser.Comment"
+							</div>
+						}
+
+					</div>
+
+					<div class="order-summary">
+
+						<div class="summary-title">
+							Общая стоимость услуг
+						</div>
+
+						<div class="summary-big-price">
+							@((order.ServicesTotalPrice + order.ManagerReward).ToString("C"))
+						</div>
+
+						<div class="summary-title mt-4">
+							Вознаграждение менеджера
+						</div>
+
+						<div class="summary-small-price">
+							@order.ManagerReward.ToString("C")
+						</div>
+
+					</div>
+
+				</div>
+
+				<hr class="separator" />
+
+				<div class="services-title mb-4">
+					Объекты в заказе
+				</div>
+
+				@foreach (var item in order.Items)
+				{
+					<div class="ordered-product-card">
+
+						<div class="ordered-product-content">
+
+							<div class="ordered-product-info">
+
+								<div class="realEstate-title">
+									@item.ProductName
+								</div>
+
+								<div class="location mt-2">
+									<i class="fas fa-location-dot"></i>
+									@item.ProductCity
+								</div>
+
+								<div class="location">
+									Площадь: @item.ProductArea м²
+								</div>
+
+								<div class="services-list mt-4">
+
+									@foreach (var service in item.Services.Where(x => !x.IsRemoved))
+									{
+										<div class="service-line">
+											<i class="fas fa-circle-check"></i>
+
+											<span>
+												@service.Name
+											</span>
+
+											<span class="service-price">
+												@service.Price.ToString("C")
+											</span>
+										</div>
+									}
+
+								</div>
+
+							</div>
+
+							<div class="ordered-product-preview">
+
+								<img src="@(item.Product?.PreviewImagePath ?? "/img/Apartment_white.png")"
+									 alt="@item.ProductName" />
+
+								<div class="preview-overlay"></div>
+
+								<div class="property-price-badge">
+									@item.CurrentPrice.ToString("C")
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+				}
+
+			</div>
+		}
+	}
+</div>

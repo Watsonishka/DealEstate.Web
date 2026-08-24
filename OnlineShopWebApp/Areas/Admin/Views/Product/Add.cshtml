@@ -1,0 +1,176 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Добавление объекта";
+}
+
+<div class="container mt-5">
+
+    <div class="mb-5">
+        <h1 class="main-title">Добавление объекта</h1>
+        <p class="subtitle">Заполните данные о новом объекте недвижимости</p>
+    </div>
+
+    <div class="realEstate-card p-4">
+
+        <form id="productForm"
+              method="post"
+              asp-area="Admin"
+              asp-controller="Product"
+              asp-action="Add"
+              enctype="multipart/form-data">
+
+            <div class="form-group mb-4">
+                <label class="form-label-custom">Тип объекта *</label>
+                <div class="custom-select-wrapper">
+                    <select id="propertyType"
+                            asp-for="Category"
+                            class="form-control custom-input">
+                        <option value="Apartments">Квартира</option>
+                        <option value="Houses">Дом</option>
+                    </select>
+                    <span class="custom-arrow">▼</span>
+                </div>
+                <span asp-validation-for="Category" class="field-validation"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label-custom">Название *</label>
+                    <input asp-for="Name" class="form-control custom-input" />
+                    <span asp-validation-for="Name" class="field-validation"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-custom">Застройщик *</label>
+                    <input asp-for="Developer" class="form-control custom-input" />
+                    <span asp-validation-for="Developer" class="field-validation"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-custom">Город *</label>
+                    <input asp-for="City" class="form-control custom-input" />
+                    <span asp-validation-for="City" class="field-validation"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-custom">Цена (₽) *</label>
+                    <input asp-for="Cost" type="number" step="any" class="form-control custom-input" />
+                    <span asp-validation-for="Cost" class="field-validation"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-custom">Площадь (м²) *</label>
+                    <input asp-for="Area" type="number" class="form-control custom-input" />
+                    <span asp-validation-for="Area" class="field-validation"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-custom">Этажность</label>
+                    <input asp-for="TotalFloors" type="number" class="form-control custom-input" />
+                    <span asp-validation-for="TotalFloors" class="field-validation"></span>
+                </div>
+                <div class="form-group full-width">
+                    <label class="form-label-custom">Описание</label>
+                    <textarea asp-for="Description" rows="3" class="form-control custom-input"></textarea>
+                    <span asp-validation-for="Description" class="field-validation"></span>
+                </div>
+                <div class="form-group full-width">
+                    <label class="form-label-custom" asp-for="UploadedImage">
+                        Загрузите изображение
+                    </label>
+                    <input asp-for="UploadedImage"
+                           type="file"
+                           class="form-control custom-input"
+                           accept="image/*" />
+                    <span asp-validation-for="UploadedImage" class="field-validation text-danger"></span>
+                </div>
+            </div>
+
+            <div id="apartment-fields" style="display: @(Model == null || Model.Category == Category.Apartments ? "block" : "none");">
+                <hr class="separator" />
+                <h3 class="section-title mb-3">Параметры квартиры</h3>
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Этаж *</label>
+                        <input asp-for="Floor" type="number" class="form-control custom-input" value="@(Model == null || Model.Floor == 0 ? 1 : Model.Floor)" />
+                        <span asp-validation-for="Floor" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Высота потолков (м) *</label>
+                        <input asp-for="CeilingHeight" type="number" class="form-control custom-input" value="@(Model == null || Model.CeilingHeight == 0 ? 2 : Model.CeilingHeight)" />
+                        <span asp-validation-for="CeilingHeight" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Класс *</label>
+                        <select asp-for="Class" class="form-control custom-input">
+                            @foreach (ApartmentClass productClass in Enum.GetValues(typeof(ApartmentClass)))
+                            {
+                                var selected = Model?.Class == productClass ? "selected" : null;
+                                var description = productClass.GetDescription();
+                                <option value="@productClass" selected="@selected">
+                                    @description
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="Class" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="form-check">
+                            <input asp-for="HasBalcony"
+                                   type="checkbox"
+                                   class="form-check-input service-checkbox"
+                                   value="true"
+                                   id="hasBalcony"
+                                   checked="@(Model?.HasBalcony ?? false)" />
+                            <label for="hasBalcony" class="form-check-label">Наличие балкона</label>
+                        </div>
+                        <span asp-validation-for="HasBalcony" class="field-validation"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="house-fields" style="display: @(Model != null && Model.Category == Category.Houses ? "block" : "none");">
+                <hr class="separator" />
+                <h3 class="section-title mb-3">Параметры дома</h3>
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Площадь участка *</label>
+
+                        <input asp-for="LandArea"
+                               type="number"
+                               class="form-control custom-input"
+                               value="@(Model?.LandArea ?? 0)" />
+
+                        <span asp-validation-for="LandArea" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="form-check">
+                            <input asp-for="HasGarage"
+                                   type="checkbox"
+                                   class="form-check-input service-checkbox"
+                                   value="true"
+                                   id="hasGarage"
+                                   checked="@(Model?.HasGarage ?? false)" />
+                            <label for="hasGarage" class="form-check-label">Наличие гаража</label>
+                        </div>
+                        <span asp-validation-for="HasGarage" class="field-validation"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions mt-4">
+                <div class="button-group">
+                    <a asp-area="Admin"
+                       asp-controller="Product"
+                       asp-action="Index"
+                       class="btn btn-outline px-4 py-2">Отмена</a>
+                    <button type="submit" class="btn btn-main px-4 py-2">Сохранить</button>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>

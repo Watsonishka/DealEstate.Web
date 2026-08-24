@@ -1,0 +1,91 @@
+﻿@model AuthorizationViewModel
+
+<div class="login-page">
+    <div class="login-card">
+
+        <div class="login-icon-wrapper">
+            <i class="fas fa-key"></i>
+        </div>
+
+        <h2 class="main-title text-center mb-3">
+            Вход в личный кабинет
+        </h2>
+
+        <p class="subtitle text-center mb-4">
+            Войдите в аккаунт для управления заявками,
+            избранным и заказами недвижимости.
+        </p>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-card mb-4">
+                <div class="validation-title">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Обнаружены ошибки
+                </div>
+
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+        <form method="post"
+              asp-controller="Account"
+              asp-action="Authorization">
+
+            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+
+            <div class="mb-4">
+                <label asp-for="Login" class="form-label-custom"></label>
+
+                <input asp-for="Login"
+                       class="form-control custom-input" />
+
+                <span asp-validation-for="Login"
+                      class="field-validation"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Password"
+                       class="form-label-custom"></label>
+
+                <input asp-for="Password"
+                       class="form-control custom-input" />
+
+                <span asp-validation-for="Password"
+                      class="field-validation"></span>
+            </div>
+
+            <div class="form-check mb-4">
+                <input asp-for="IsRememberMe"
+                       class="form-check-input" />
+
+                <label asp-for="IsRememberMe"
+                       class="form-check-label">
+                </label>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-main w-100 py-3">
+                Войти
+            </button>
+
+        </form>
+
+        <div class="login-divider my-4"></div>
+
+        <div class="text-center">
+            <div class="subtitle mb-3">
+                Еще нет аккаунта?
+            </div>
+
+            <a asp-area=""
+               asp-controller="Account"
+               asp-action="Registration"
+               asp-route-ReturnUrl="@Model.ReturnUrl"
+               class="btn-outline w-100 d-block text-center">
+                Создать аккаунт
+            </a>
+        </div>
+
+    </div>
+</div>

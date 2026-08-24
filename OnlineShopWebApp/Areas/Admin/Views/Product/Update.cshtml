@@ -1,0 +1,210 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Просмотр объекта";
+    var isApartment = Model.Category == Category.Apartments;
+    var isHouse = Model.Category == Category.Houses;
+}
+
+@if (ViewBag.IsEditMode == true)
+{
+    <input type="hidden" id="IsEditMode" value="true" />
+}
+
+<div class="container mt-5">
+
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="main-title">Объект недвижимости</h1>
+                <p class="subtitle">Просмотр и редактирование объекта</p>
+            </div>
+            <button type="button" id="editToggleBtn" class="btn btn-main">Редактировать</button>
+        </div>
+    </div>
+
+    <div class="realEstate-card p-4">
+
+        <form id="productForm"
+              method="post"
+              asp-area="Admin"
+              asp-controller="Product"
+              asp-action="Update"
+              enctype="multipart/form-data">
+
+            <input type="hidden" asp-for="ID" />
+            <input type="hidden" asp-for="Category" />
+            <input type="hidden" asp-for="PreviewImagePath" />
+
+            @if (isHouse)
+            {
+                <input type="hidden" name="Floor" value="1" />
+                <input type="hidden" name="CeilingHeight" value="2" />
+                <input type="hidden" name="Class" value="@ApartmentClass.Economy" />
+                <input type="hidden" name="HasBalcony" value="false" />
+            }
+
+            @if (isApartment)
+            {
+                <input type="hidden" name="LandArea" value="0" />
+                <input type="hidden" name="HasGarage" value="false" />
+            }
+
+            <div class="form-group mb-4">
+                <label class="form-label-custom">Тип объекта</label>
+                <input class="form-control custom-input" value="@(isApartment ? "Квартира" : "Дом")" disabled />
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label class="form-label-custom">Название</label>
+                    <input asp-for="Name" class="form-control custom-input editable-field" />
+                    <span asp-validation-for="Name" class="field-validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-custom">Застройщик</label>
+                    <input asp-for="Developer" class="form-control custom-input editable-field" />
+                    <span asp-validation-for="Developer" class="field-validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-custom">Город</label>
+                    <input asp-for="City" class="form-control custom-input editable-field" />
+                    <span asp-validation-for="City" class="field-validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-custom">Цена (₽)</label>
+                    <input asp-for="Cost" class="form-control custom-input editable-field" />
+                    <span asp-validation-for="Cost" class="field-validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-custom">Площадь (м²)</label>
+                    <input asp-for="Area" class="form-control custom-input editable-field" />
+                    <span asp-validation-for="Area" class="field-validation"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-custom">Этажность</label>
+                    <input asp-for="TotalFloors" class="form-control custom-input editable-field" />
+                    <span asp-validation-for="TotalFloors" class="field-validation"></span>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label-custom">Описание</label>
+                    <textarea asp-for="Description" rows="4" class="form-control custom-input editable-field"></textarea>
+                    <span asp-validation-for="Description" class="field-validation"></span>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label-custom">
+                        Загрузите новое изображение (если нужно заменить текущее)
+                    </label>
+
+                    @if (!string.IsNullOrEmpty(Model?.PreviewImagePath))
+                    {
+                        <div class="mb-2">
+                            <small class="text-muted d-block mb-1">Текущее изображение:</small>
+                            <img src="@Model.PreviewImagePath"
+                                 alt="Текущее фото"
+                                 style="max-height: 150px; border-radius: 8px; object-fit: cover;"
+                                 id="currentImage" />
+                        </div>
+                    }
+
+                    <div id="fileUploadSection" class="edit-mode-hidden">
+                        <div class="custom-file-wrapper">
+                            <input asp-for="UploadedImage"
+                                   type="file"
+                                   id="uploadedFileInput"
+                                   class="hidden-file-input editable-field"
+                                   accept="image/*"
+                                   onchange="updateFileName(this)" />
+                        </div>
+                    </div>
+
+            @if (isApartment)
+            {
+                <hr class="separator" />
+                <h3 class="section-title mb-3">Параметры квартиры</h3>
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Этаж *</label>
+                        <input asp-for="Floor" type="number" min="1" max="100" class="form-control custom-input editable-field" />
+                        <span asp-validation-for="Floor" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Высота потолков (м) *</label>
+                        <input asp-for="CeilingHeight" type="number" min="2" max="10" class="form-control custom-input editable-field" />
+                        <span asp-validation-for="CeilingHeight" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Класс *</label>
+                        <select asp-for="Class" class="form-control custom-input editable-field">
+                            <option value="">Выберите класс</option>
+                            @foreach (ApartmentClass productClass in Enum.GetValues(typeof(ApartmentClass)))
+                            {
+                                var selected = Model?.Class == productClass ? "selected" : null;
+                                var description = productClass.GetDescription();
+                                <option value="@productClass" selected="@selected">
+                                    @description
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="Class" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="form-check">
+                            <input asp-for="HasBalcony" type="checkbox" class="form-check-input editable-field" />
+                            <label class="form-check-label">Наличие балкона</label>
+                        </div>
+                        <span asp-validation-for="HasBalcony" class="field-validation"></span>
+                    </div>
+
+                </div>
+            }
+
+            @if (isHouse)
+            {
+                <hr class="separator" />
+                <h3 class="section-title">Параметры дома</h3>
+                <div class="form-row">
+
+                    <div class="form-group full-width">
+                        <label class="form-label-custom">Площадь участка (м²) *</label>
+                        <input asp-for="LandArea" type="number" min="0" max="10000" step="0.1" class="form-control custom-input editable-field" />
+                        <span asp-validation-for="LandArea" class="field-validation"></span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="form-check">
+                            <input asp-for="HasGarage" type="checkbox" class="form-check-input editable-field" />
+                            <label class="form-check-label">Наличие гаража</label>
+                        </div>
+                        <span asp-validation-for="HasGarage" class="field-validation"></span>
+                    </div>
+
+                </div>
+            }
+
+            <div class="form-actions mt-4">
+                <div class="button-group">
+                    <a asp-area="Admin"
+                       asp-controller="Product"
+                       asp-action="Index"
+                       class="btn btn-outline">Назад</a>
+                    <button type="submit" id="saveBtn" class="btn btn-main d-none" disabled>Сохранить</button>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
