@@ -51,6 +51,11 @@
   
 <img width="1388" height="658" alt="image" src="https://github.com/user-attachments/assets/98aaca37-6681-48b8-9fbe-b0496e392e55" />
 
+- Отображение оформленных заявок пользователем
+
+<img width="1329" height="811" alt="image" src="https://github.com/user-attachments/assets/e9bb7cfd-506f-44ca-9dc0-d83f8eeeba44" />
+
+
 ### 🛒 Корзина заявок (Bids) и оформление сделки (Orders)
 - Добавление объектов и сопутствующих услуг к заявке.
   
